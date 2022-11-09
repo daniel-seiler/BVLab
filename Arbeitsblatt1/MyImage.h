@@ -1,6 +1,8 @@
 #pragma once
 #include "MyHisto.h"
 #include <fstream>
+#include <cstdint>
+#include <cstring>
 using namespace std;
 
 class CMyImage
