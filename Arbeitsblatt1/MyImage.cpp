@@ -240,7 +240,10 @@ bool CMyImage::WriteBmpFile(const char* fileName) const
 
 void CMyImage::Copy(const CMyImage& toCopy)
 {
-  // todo
+    Resize(toCopy.m_width, toCopy.m_height);
+    if (!toCopy.IsEmpty()) {
+            std::memcpy(m_pData, toCopy.m_pData, toCopy.GetSizeInBytes());
+    }
 }
 
 bool CMyImage::IsEmpty() const
@@ -250,7 +253,15 @@ bool CMyImage::IsEmpty() const
 
 void CMyImage::Resize(int width, int height)
 {
-    // todo
+    m_width = width;
+    m_height = height;
+    delete m_pData;
+    if (width == 0 || height == 0) {
+            m_pData = NULL;
+    } else {
+            m_pData = new unsigned char[width * height];
+            std::fill_n(m_pData, width * height, 0);
+    }
 }
 
 void CMyImage::SetPixel(int x, int y, unsigned char value)
