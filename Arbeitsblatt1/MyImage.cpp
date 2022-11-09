@@ -17,7 +17,7 @@ CMyImage::CMyImage(const CMyImage& toCopy)
 CMyImage::~CMyImage(void)
 {
   if (m_pData != NULL)
-    free(m_pData);
+    delete m_pData;
 }
 
 bool CMyImage::ReadBmpHeader(istream& is, int& width, int& height, int& palEntries) const
@@ -240,10 +240,21 @@ bool CMyImage::WriteBmpFile(const char* fileName) const
 
 void CMyImage::Copy(const CMyImage& toCopy)
 {
-  // todo
+    Resize(toCopy.m_width, toCopy.m_height);
+    if (!toCopy.IsEmpty()) {
+        std::memcpy(m_pData, toCopy.m_pData, toCopy.GetSizeInBytes());
+    }
 }
 
 void CMyImage::Resize(int width, int height)
 {
-  // todo
+    m_width = width;
+    m_height = height;
+    delete m_pData;
+    if (width == 0 || height == 0) {
+        m_pData = NULL;
+    } else {
+        m_pData = new unsigned char[width * height];
+        std::fill_n(m_pData, width * height, 0);
+    }
 }
