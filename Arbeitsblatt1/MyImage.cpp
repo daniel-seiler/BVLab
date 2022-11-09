@@ -266,10 +266,12 @@ void CMyImage::Resize(int width, int height)
 
 void CMyImage::SetPixel(int x, int y, unsigned char value)
 {
-    m_pData[x*m_width + y*m_height] = value;
+    m_pData[(m_height - y - 1)*m_width + x] = value;
+    //m_pData[x*m_width + y*m_height] = value;
 }
 
 unsigned char CMyImage::GetPixel(int x, int y) const
 {
-    return m_pData[x*m_width + y*m_height];
+    return m_pData[(m_height - y - 1)*m_width + x];
+    //return m_pData[x*m_width + y*m_height];
 }

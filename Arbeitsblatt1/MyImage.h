@@ -10,7 +10,6 @@ class CMyImage
   int m_width;
   int m_height;
 
-  unsigned char* m_pData;
 
 protected:
 
@@ -20,6 +19,7 @@ protected:
   void WriteBmpHeader(ostream& os, int offset, int sizeOfFile, int sizeOfImage) const;
   
 public:
+  unsigned char* m_pData;
 
   CMyImage(void);
   CMyImage(const CMyImage& toCopy);
