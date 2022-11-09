@@ -237,6 +237,11 @@ bool CMyImage::WriteBmpFile(const char* fileName) const
   return true;
 }
 
+bool CMyImage::IsEmpty() const
+{
+
+}
+
 
 void CMyImage::Copy(const CMyImage& toCopy)
 {
