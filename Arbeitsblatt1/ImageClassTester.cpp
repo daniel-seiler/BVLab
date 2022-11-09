@@ -8,10 +8,9 @@
 
 int main(int argc, char *argv[])
 {
-    std::string image_path = std::getenv("IMAGES");
     CMyImage testImage;
     // Absolute path
-    testImage.ReadBmpFile(image_path.append("/Kap.bmp").c_str());
+    testImage.ReadBmpFile(std::string(std::getenv("IMAGES")).append("/Kap.bmp").c_str());
 
     // Slow way
     clock_t start_slow, finish_slow;
@@ -25,11 +24,11 @@ int main(int argc, char *argv[])
 
     finish_slow = clock();
 
-    testImage.WriteBmpFile(image_path.append("/Kap_new.bmp").c_str());
+    testImage.WriteBmpFile(std::string(std::getenv("IMAGES")).append("/Kap_new.bmp").c_str());
     std::cout << "Run time slow method: " << (double) (finish_slow -start_slow) / CLOCKS_PER_SEC << std::endl;
 
      // Absolute path
-    testImage.ReadBmpFile(image_path.append("/Kap.bmp").c_str());
+    testImage.ReadBmpFile(std::string(std::getenv("IMAGES")).append("/Kap.bmp").c_str());
 
     // Slow way
     clock_t start_fast, finish_fast;
@@ -39,7 +38,7 @@ int main(int argc, char *argv[])
 
     for (int y = 0; y < testImage.GetHeight(); y++) {
         p = testImage.m_pData + (testImage.GetHeight() - y - 1)*testImage.GetWidth();
-        for (int x = 0; x < testImage.GetHeight(); x++) {
+        for (int x = 0; x < testImage.GetWidth(); x++) {
             *p = 255 - *p;
             p++;
         }
@@ -47,7 +46,7 @@ int main(int argc, char *argv[])
 
     finish_fast = clock();
 
-    testImage.WriteBmpFile(image_path.append("/Kap_new.bmp").c_str());
+    testImage.WriteBmpFile(std::string(std::getenv("IMAGES")).append("/Kap_new.bmp").c_str());
     std::cout << "Run time fast method: " << (double) (finish_fast -start_fast) / CLOCKS_PER_SEC << std::endl;
 
 
