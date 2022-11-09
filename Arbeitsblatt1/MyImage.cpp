@@ -44,7 +44,7 @@ bool CMyImage::ReadBmpHeader(istream& is, int& width, int& height, int& palEntri
   is.read((char*)&offset, 4);
 
   // ************************* Bitmap Information = 44 bytes *************************
-  
+
   // Number of Bytes in Header (wieso 40?)
   is.read((char*)&i, 4);
   if ( i != 40 )
@@ -57,7 +57,7 @@ bool CMyImage::ReadBmpHeader(istream& is, int& width, int& height, int& palEntri
   is.read((char*)&si, 2);
   if (si != 1)
     return false;
-  
+
   // bits per pixel, must be 8;
   is.read((char*)&bpp, 2);
   if (bpp != 8)
@@ -69,12 +69,12 @@ bool CMyImage::ReadBmpHeader(istream& is, int& width, int& height, int& palEntri
     return false;
   // Groesse des Bildes in bytes
   is.read((char*)&i, 4);
-  
+
   // Aufloesung, must be 0
-  is.read((char*)&i, 4); 
-  is.read((char*)&i, 4); 
+  is.read((char*)&i, 4);
+  is.read((char*)&i, 4);
   // Number of Color Indizes used und important
-  is.read((char*)&i, 4); 
+  is.read((char*)&i, 4);
   is.read((char*)&i, 4);
 
   palEntries = (offset - 54);
@@ -133,13 +133,13 @@ void CMyImage::WriteBmpHeader(ostream& os, int offset, int sizeOfFile, int sizeO
   unsigned char ch;
 
   // ************************************ Header = 14 byte ****************************
-  
+
   // ASCII-Text BM = 2 bytes
   ch = 0x42;
   os.write((char*)&ch, 1);
   ch = 0x4D;
   os.write((char*)&ch, 1);
- 
+
   // SizeOfFile
   os.write((char*)&sizeOfFile, 4);
 
@@ -151,7 +151,7 @@ void CMyImage::WriteBmpHeader(ostream& os, int offset, int sizeOfFile, int sizeO
   os.write((char*)&offset, 4);
 
   /************************* Bitmap Information = 44 bytes *************************/
-  
+
   // Number of Bytes in Header (wieso 40?)
   i = 40;
   os.write((char*)&i, 4);
@@ -159,7 +159,7 @@ void CMyImage::WriteBmpHeader(ostream& os, int offset, int sizeOfFile, int sizeO
   // Breite und Hoehe in pixel
   os.write((char*)&m_width, 4);
   os.write((char*)&m_height, 4);
-  
+
   // Number of Planes, must be 1
   si = 1;
   os.write((char*)&si, 2);
@@ -172,11 +172,11 @@ void CMyImage::WriteBmpHeader(ostream& os, int offset, int sizeOfFile, int sizeO
   os.write((char*)&sizeOfImage, 4);
   // Aufloesung, must be 0
   i = 0;
-  os.write((char*)&i, 4); 
-  os.write((char*)&i, 4); 
+  os.write((char*)&i, 4);
+  os.write((char*)&i, 4);
   // Number of Color Indizes used und important
   i = 0; //256;
-  os.write((char*)&i, 4); 
+  os.write((char*)&i, 4);
   os.write((char*)&i, 4);
 }
 
@@ -192,7 +192,7 @@ bool CMyImage::WriteBmpFile(const char* fileName) const
   const unsigned char* p = m_pData;
 
   // Bytes pro Zeile erhoehen, so dass Anzahl durch 4byte teilbar
-  int bytesProZeile = m_width; 
+  int bytesProZeile = m_width;
   if ((bytesProZeile%4) != 0)
     bytesProZeile = (((bytesProZeile/4)+1)*4);
   int rest = bytesProZeile - m_width;
@@ -206,7 +206,7 @@ bool CMyImage::WriteBmpFile(const char* fileName) const
   WriteBmpHeader(os, offset, sizeOfFile, sizeOfImage);
 
   // ************************* Paletteneintraege = 1024 bytes *********************
- 
+
   pixeldummy = 0;
   for (int j = 0; j < 256; j++)
   {
@@ -237,29 +237,28 @@ bool CMyImage::WriteBmpFile(const char* fileName) const
   return true;
 }
 
-bool CMyImage::IsEmpty() const
-{
-
-}
-
 
 void CMyImage::Copy(const CMyImage& toCopy)
 {
-    Resize(toCopy.m_width, toCopy.m_height);
-    if (!toCopy.IsEmpty()) {
-        std::memcpy(m_pData, toCopy.m_pData, toCopy.GetSizeInBytes());
-    }
+  // todo
+}
+
+bool CMyImage::IsEmpty() const
+{
+    return (m_pData == NULL);
 }
 
 void CMyImage::Resize(int width, int height)
 {
-    m_width = width;
-    m_height = height;
-    delete m_pData;
-    if (width == 0 || height == 0) {
-        m_pData = NULL;
-    } else {
-        m_pData = new unsigned char[width * height];
-        std::fill_n(m_pData, width * height, 0);
-    }
+    // todo
+}
+
+void CMyImage::SetPixel(int x, int y, unsigned char value)
+{
+    m_pData[x*m_width + y*m_height] = value;
+}
+
+unsigned char CMyImage::GetPixel(int x, int y) const
+{
+    return m_pData[x*m_width + y*m_height];
 }
