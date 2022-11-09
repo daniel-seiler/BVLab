@@ -277,34 +277,38 @@ unsigned char CMyImage::GetPixel(int x, int y) const
 }
 
 void CMyImage::MakeBinary(int thresh) {
-    unsigned char* p = m_pData;
 
-    for (int y = 0; y < m_height; y++ )
+    for (unsigned char* p = m_pData; p < m_height * m_width + m_pData; p++ )
     {
-        p = m_pData + (m_height - y - 1)*m_width;
-        for (int x = 0; x < m_width; x++)
-        {
-            *p = (*p <= thresh) ? 0 : 255;
-            p++;
-        }
+        *p = (*p <= thresh) ? 0 : 255;
     }
 }
 
-void CMyImage::CalcHisto(CMyHisto &histo) {
-    unsigned char* p = m_pData;
+void CMyImage::CalcHisto(CMyHisto &histo) const {
 
-    for (int y = 0; y < m_height; y++ )
+    for (unsigned char* p = m_pData; p < m_height * m_width + m_pData; p++ )
     {
-        p = m_pData + (m_height - y - 1)*m_width;
-        for (int x = 0; x < m_width; x++)
-        {
-            histo.Increment(*p++);
-        }
+        histo.Increment(*p++);
     }
+
 }
 
-void CMyImage::CalcThreshByOtsu() {
-    CMyHisto *histo = new CMyHisto();
+double CMyImage::CalcThreshByOtsu() const {
+    CMyHisto histo;
     CalcHisto(histo);
-
+    double sigmaB = 0.0;
+    double maxSigmaB = -1.0;
+    int T;
+    int TStar = -1;
+    //TODO
+    for (T = 0; T < 255; T++)
+    {
+        //TODO calc sigma
+        if (sigmaB > maxSigmaB)
+        {
+            maxSigmaB = sigmaB;
+            TStar = T;
+        }
+    }
+    return TStar;
 }
