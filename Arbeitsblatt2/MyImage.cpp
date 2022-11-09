@@ -275,3 +275,36 @@ unsigned char CMyImage::GetPixel(int x, int y) const
     return m_pData[(m_height - y - 1)*m_width + x];
     //return m_pData[x*m_width + y*m_height];
 }
+
+void CMyImage::MakeBinary(int thresh) {
+    unsigned char* p = m_pData;
+
+    for (int y = 0; y < m_height; y++ )
+    {
+        p = m_pData + (m_height - y - 1)*m_width;
+        for (int x = 0; x < m_width; x++)
+        {
+            *p = (*p <= thresh) ? 0 : 255;
+            p++;
+        }
+    }
+}
+
+void CMyImage::CalcHisto(CMyHisto &histo) {
+    unsigned char* p = m_pData;
+
+    for (int y = 0; y < m_height; y++ )
+    {
+        p = m_pData + (m_height - y - 1)*m_width;
+        for (int x = 0; x < m_width; x++)
+        {
+            histo.Increment(*p++);
+        }
+    }
+}
+
+void CMyImage::CalcThreshByOtsu() {
+    CMyHisto *histo = new CMyHisto();
+    CalcHisto(histo);
+
+}
