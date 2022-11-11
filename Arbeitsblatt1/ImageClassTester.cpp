@@ -1,5 +1,3 @@
-// ImageClassTester.cpp : Definiert den Einstiegspunkt f?r die Konsolenanwendung.
-//
 
 #include "MyImage.h"
 #include "MyHisto.h"
@@ -36,7 +34,7 @@ int main(int argc, char *argv[])
      // Absolute path
     testImage.ReadBmpFile((IMG_PATH + "Kap.bmp").c_str());
 
-    // Slow way
+    // Fast way
     clock_t start_fast, finish_fast;
     start_fast = clock();
 
@@ -47,7 +45,7 @@ int main(int argc, char *argv[])
     finish_fast = clock();
 
     testImage.WriteBmpFile(IMG_PATH.append("Kap_new_2.bmp").c_str());
-    std::cout << "Run time fast method: " << (double) (finish_fast -start_fast) / CLOCKS_PER_SEC << std::endl;
+    std::cout << "Run time fast method: " << (double) (finish_fast - start_fast) / CLOCKS_PER_SEC << std::endl;
 
 
     return 0;
