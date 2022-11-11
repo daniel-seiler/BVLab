@@ -40,14 +40,8 @@ int main(int argc, char *argv[])
     clock_t start_fast, finish_fast;
     start_fast = clock();
 
-    unsigned char* p = testImage.m_pData;
-
-    for (int y = 0; y < testImage.GetHeight(); y++) {
-        p = testImage.m_pData + (testImage.GetHeight() - y - 1)*testImage.GetWidth();
-        for (int x = 0; x < testImage.GetWidth(); x++) {
-            *p = 255 - *p;
-            p++;
-        }
+    for (unsigned char *p = testImage.m_pData; p < testImage.m_pData + testImage.GetWidth() * testImage.GetHeight(); p++) {
+        *p = 255 - *p;
     }
 
     finish_fast = clock();
