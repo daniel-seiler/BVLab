@@ -6,11 +6,17 @@
 #include <time.h>
 #include <iostream>
 
+#ifdef __linux__
+    std::string IMG_PATH = "/home/uncreative/Git/BVLab/Bilddaten_1_DigitaleBilder/";
+#else
+    std::string IMG_PATH = std::getenv("IMAGES");
+#endif
+
 int main(int argc, char *argv[])
 {
     CMyImage testImage;
     // Absolute path
-    testImage.ReadBmpFile(std::string(std::getenv("IMAGES")).append("/Kap.bmp").c_str());
+    testImage.ReadBmpFile((IMG_PATH + "Kap.bmp").c_str());
 
     // Slow way
     clock_t start_slow, finish_slow;
@@ -24,11 +30,11 @@ int main(int argc, char *argv[])
 
     finish_slow = clock();
 
-    testImage.WriteBmpFile(std::string(std::getenv("IMAGES")).append("/Kap_new.bmp").c_str());
+    testImage.WriteBmpFile((IMG_PATH + "Kap_new_1.bmp").c_str());
     std::cout << "Run time slow method: " << (double) (finish_slow -start_slow) / CLOCKS_PER_SEC << std::endl;
 
      // Absolute path
-    testImage.ReadBmpFile(std::string(std::getenv("IMAGES")).append("/Kap.bmp").c_str());
+    testImage.ReadBmpFile((IMG_PATH + "Kap.bmp").c_str());
 
     // Slow way
     clock_t start_fast, finish_fast;
@@ -46,7 +52,7 @@ int main(int argc, char *argv[])
 
     finish_fast = clock();
 
-    testImage.WriteBmpFile(std::string(std::getenv("IMAGES")).append("/Kap_new.bmp").c_str());
+    testImage.WriteBmpFile(IMG_PATH.append("Kap_new_2.bmp").c_str());
     std::cout << "Run time fast method: " << (double) (finish_fast -start_fast) / CLOCKS_PER_SEC << std::endl;
 
 
