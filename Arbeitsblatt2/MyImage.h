@@ -51,5 +51,5 @@ public:
 
   void CalcHisto(CMyHisto& histo) const;
 
-  int CalcThreshByOtsu() const;
+  double CalcThreshByOtsu() const;
 };
