@@ -2,14 +2,16 @@
 //
 
 #include "MyImage.h"
-#include "MyHisto.h"
-#include <time.h>
+#include <cstring>
 #include <iostream>
 
 int main(int argc, char *argv[])
 {
     CMyImage testImage;
-
+    // Absolute path
+    testImage.ReadBmpFile(std::string(std::getenv("IMAGES")).append("/Flower.bmp").c_str());
+    double otsu = testImage.CalcThreshByOtsu();
+    cout << otsu << endl;
     return 0;
 }
 
