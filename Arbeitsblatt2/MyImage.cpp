@@ -1,5 +1,6 @@
 #include "MyImage.h"
-#include "math.h"
+#include <cmath>
+#include <iostream>
 
 CMyImage::CMyImage(void)
 {
@@ -300,14 +301,23 @@ double CMyImage::CalcThreshByOtsu() const {
     double maxSigmaB = -1.0;
     int T;
     int TStar = -1;
-    //TODO
-    for (T = 0; T < 255; T++)
+    double P_H_of_T = 0.0;
+    double mean_of_T = 0.0;
+    double histoEntry = 0.0;
+    double mean = histo.CalcMeanValue();
+    for (T = 1; T < 255; T++)
     {
-        //TODO calc sigma
-        if (sigmaB > maxSigmaB)
-        {
-            maxSigmaB = sigmaB;
-            TStar = T;
+        histoEntry = histo.GetNormalizedEntry(T);
+        mean_of_T = mean_of_T + T * histoEntry;
+        P_H_of_T = P_H_of_T + histoEntry;
+        if (P_H_of_T != 0) {
+            sigmaB = std::pow((mean * P_H_of_T - mean_of_T) , 2.0) / (P_H_of_T * (1 - P_H_of_T));
+            std::cout << sigmaB << endl;
+            if (sigmaB > maxSigmaB)
+            {
+                maxSigmaB = sigmaB;
+                TStar = T;
+            }
         }
     }
     return TStar;
