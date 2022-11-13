@@ -307,7 +307,7 @@ double CMyImage::CalcThreshByOtsu() const {
     double mean = histo.CalcMeanValue();
     for (T = 1; T < 255; T++)
     {
-        histoEntry = histo.GetEntry(T);
+        histoEntry = histo.GetNormalizedEntry(T);
         mean_of_T = mean_of_T + T * histoEntry;
         P_H_of_T = P_H_of_T + histoEntry;
         if (P_H_of_T != 0) {
