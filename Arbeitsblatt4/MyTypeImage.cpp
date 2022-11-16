@@ -110,8 +110,14 @@ template< class T >
 bool
 CMyTypeImage<T>::CopyChannel(const CMyTypeImage<T>& source, int channel)
 {
-
-  /************** todo ****************/
-
+  if (channel >= source.m_depth) return false;
+  Resize(source.m_width, source.m_height, 1);
+  int this_it = 0;
+  int source_it = channel;
+  while(this_it < m_height * m_width) {
+    m_pData[this_it] = source.m_pData[source_it];
+    this_it++;
+    source_it += source.m_depth;
+  }
   return true;
 }

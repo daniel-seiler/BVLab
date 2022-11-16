@@ -4,9 +4,22 @@
 #include "MyCharImage.h"
 #include <iostream>
 
+#ifdef __linux__
+std::string IMG_PATH = "/home/uncreative/Git/BVLab/Bilddaten_4_Farbbilder/";
+#else
+std::string IMG_PATH = std::getenv("IMAGES");
+#endif
+
 int main(int argc, char *argv[])
 {
-  //Todo
+  CMyCharImage img = CMyCharImage();
+  img.ReadBmpFile((IMG_PATH + "Rose.bmp").c_str());
+
+  CMyCharImage test = CMyCharImage();
+  test.ApplyThresh(img, 240, 0);
+  test.WriteBmpFile((IMG_PATH + "Rose_isolated_1.bmp").c_str());
+  test.ApplyThresh(img, 40, 1);
+  test.WriteBmpFile((IMG_PATH + "Rose_isolated_2.bmp").c_str());
 
   return 0;
 }

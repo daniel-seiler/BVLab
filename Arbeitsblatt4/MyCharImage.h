@@ -52,7 +52,10 @@ template <class S>
 bool
 CMyCharImage::ApplyThresh(const CMyTypeImage<S>& source, double thresh, int channel)
 {
-  /************** todo ****************/
+  CopyChannel(source, channel);
+  for(S *p = this->m_pData; p < m_pData + (m_height * m_width); p++) {
+    *p = (*p <= thresh) ? 0 : 255;
+  }
 
   return true;
 }
