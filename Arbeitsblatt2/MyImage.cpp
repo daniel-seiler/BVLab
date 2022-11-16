@@ -310,9 +310,8 @@ double CMyImage::CalcThreshByOtsu() const {
         histoEntry = histo.GetNormalizedEntry(T);
         mean_of_T = mean_of_T + T * histoEntry;
         P_H_of_T = P_H_of_T + histoEntry;
-        if (P_H_of_T != 0) {
+        if (P_H_of_T > 0 && P_H_of_T < 1) {
             sigmaB = std::pow((mean * P_H_of_T - mean_of_T) , 2.0) / (P_H_of_T * (1 - P_H_of_T));
-            std::cout << sigmaB << endl;
             if (sigmaB > maxSigmaB)
             {
                 maxSigmaB = sigmaB;
