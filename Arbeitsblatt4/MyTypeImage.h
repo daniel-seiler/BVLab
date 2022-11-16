@@ -38,7 +38,7 @@ public:
   int GetWidth()  const {return m_width;};
   int GetHeight() const {return m_height;};
   int GetDepth()  const {return m_depth;};
-  const T* GetData() const {return m_pData;};
+  T* GetData() const {return m_pData;};
 
   //......... todo .........
  
