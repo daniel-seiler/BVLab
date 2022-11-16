@@ -1,0 +1,10 @@
+# General
+*.zip
+
+# Qt Creator
+*.pro.user
+build*
+
+# Clion
+cmake-build-debug
+.idea
