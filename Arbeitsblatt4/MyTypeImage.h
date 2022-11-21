@@ -39,6 +39,9 @@ public:
   int GetHeight() const {return m_height;};
   int GetDepth()  const {return m_depth;};
   T* GetData() const {return m_pData;};
+  T GetPixel(int x, int y, int depth) const;
+
+  void SetPixel(int x, int y, int depth, T value);
 
   //......... todo .........
  

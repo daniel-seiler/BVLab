@@ -101,7 +101,21 @@ CMyTypeImage<T>::ApplyFilter(const CMyTypeImage<T>& source, const CMyFilter& fil
   const T*             pSource = source.GetData();
   const int*           pFilter = filter.GetData();
 
-  /************** todo ****************/
+  for (int x = 0; x < source.GetWidth(); x++) {
+      for (int y = 0; y < source.GetHeight(); y++) {
+          int new_pixel = 0;
+          for (int f_x = 0; f_x < filter.GetWidth(); f_x++) {
+              for (int f_y = 0; f_y < filter.GetHeight(); f_y++) {
+                  int x_max_offset = filter.GetWidth() / 2;
+                  int y_max_offset = filter.GetHeight() / 2;
+
+                  new_pixel += (int) source.GetPixel(x - x_max_offset + f_x, y - y_max_offset + f_y, 1) * filter.GetEntry(f_x, f_y);
+              }
+          }
+          SetPixel(x, y, 1, (T) new_pixel);
+      }
+  }
+
   
   return true;
 }
@@ -120,4 +134,18 @@ CMyTypeImage<T>::CopyChannel(const CMyTypeImage<T>& source, int channel)
     source_it += source.m_depth;
   }
   return true;
+}
+
+template< class T >
+T CMyTypeImage<T>::GetPixel(int x, int y, int depth) const {
+    if (x < 0 || x >= m_width || y < 0 || y >= m_height) {
+        return 0;
+    } else {
+        return m_pData[(m_height - y - 1) * m_width + x + depth];
+    }
+}
+
+template< class T >
+void CMyTypeImage<T>::SetPixel(int x, int y, int depth, T value) {
+    m_pData[(m_height - y - 1) * m_width + x + depth] = value;
 }

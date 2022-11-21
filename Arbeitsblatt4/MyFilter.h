@@ -26,7 +26,7 @@ public:
   int GetEntry(int x, int y) const { return m_pData[y*m_width + x];};
   const int* GetData() const { return m_pData; };
   double GetScale() const { return m_scale; };
- 
+
   // initialize filter as meanfilter with given size
   bool InitMeanFilter(int width, int height);
 
