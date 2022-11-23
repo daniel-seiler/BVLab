@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
   CMyFilter filter = CMyFilter();
   CMyCharImage source = CMyCharImage();
-  source.CopyChannel(img, 1);
+  source.CopyChannel(img, 0);
   filter.InitMeanFilter(5, 5);
   test = CMyCharImage();
   test.ApplyFilter(source, filter);

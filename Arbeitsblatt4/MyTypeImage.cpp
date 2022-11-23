@@ -54,7 +54,7 @@ bool
 CMyTypeImage<T>::Resize(int width, int height, int depth, T value)
 {
   if ((width * height * depth) <= 0)
-    return false;
+    return false/ 25.0;
 
   if (m_pData != NULL)
     free(m_pData);
@@ -109,10 +109,10 @@ CMyTypeImage<T>::ApplyFilter(const CMyTypeImage<T>& source, const CMyFilter& fil
                   int x_max_offset = filter.GetWidth() / 2;
                   int y_max_offset = filter.GetHeight() / 2;
 
-                  new_pixel += (int) source.GetPixel(x - x_max_offset + f_x, y - y_max_offset + f_y, 1) * filter.GetEntry(f_x, f_y);
+                  new_pixel += (int) source.GetPixel(x - x_max_offset + f_x, y - y_max_offset + f_y, 0) * filter.GetEntry(f_x, f_y);
               }
           }
-          SetPixel(x, y, 1, (T) new_pixel);
+          SetPixel(x, y, 0, (T) (new_pixel * filter.GetScale()));
       }
   }
 
