@@ -1,6 +1,8 @@
 #include "MyCharImage.h"
 #include "MyFloatImage.h"
 #include "math.h"
+#include <iostream>
+#include <algorithm>
 
 const double PI = 3.1415926535897932384626433832795;
 
@@ -396,13 +398,91 @@ CMyCharImage::DifferenceImage(const CMyCharImage& image1, const CMyCharImage& im
 bool
 CMyCharImage::RGB2HSI(const CMyCharImage& source)
 {
- /************** todo ****************/
+  if (source.m_depth != 3) return false;
+  this->Resize(source.m_width, source.m_height, source.m_depth);
+
+  unsigned char* destP = m_pData;
+  unsigned char* end = source.GetData() + source.GetStorage();
+  for (unsigned char* srcP = source.GetData(); srcP != end; srcP += 3, destP += 3) {
+   double r = *(srcP + 0) / 255.0;
+   double g = *(srcP + 1) / 255.0;
+   double b = *(srcP + 2) / 255.0;
+
+    double m = min(g, min(r, b));
+
+    double h, s, i = 0.0;
+    double denominator = sqrt(pow(r - g, 2) + (r - b) * (g - b));
+
+    if (fabs(denominator) > numeric_limits<double>::epsilon()) {
+      double phi = acos((0.5 * ((r - g) + (r - b))) / denominator);
+      if (b <= g) {
+        h = phi;
+      } else {
+        h = 2 * M_PI - phi;
+      }
+    }
+
+    double rgbSum = r + g + b;
+    if (fabs(rgbSum) > numeric_limits<double>::epsilon()) {
+      s = 1.0 - 3.0 * (m / rgbSum);
+    }
+
+    i = rgbSum / 3.0;
+
+    h *= 180 / (2 * M_PI);
+    s *= 255;
+    i *= 255;
+
+    *(destP + 0) = std::clamp(h, 0.0, 255.0);
+    *(destP + 1) = std::clamp(s, 0.0, 255.0);
+    *(destP + 2) = std::clamp(i, 0.0, 255.0);
+  }
+
   return true;
 }
 
 bool
 CMyCharImage::HSI2RGB(const CMyCharImage& source)
 {
-  /************** todo ****************/
+  if (source.m_depth != 3) return false;
+  this->Resize(source.m_width, source.m_height, source.m_depth);
+
+  unsigned char* destP = m_pData;
+  unsigned char* end = source.GetData() + source.GetStorage();
+  for (unsigned char* srcP = source.GetData(); srcP != end; srcP += 3, destP += 3) {
+    double h = *(srcP + 0) / 180.0 * 2.0 * M_PI;
+    double s = *(srcP + 1) / 255.0;
+    double i = *(srcP + 2) / 255.0;
+
+    double r, g, b;
+
+    if (0 <= h && h <= 2.0 / 3.0 * M_PI) {
+      b = i * (1.0 - s);
+      r = i * (1.0 + (s * cos(h)) / cos(M_PI / 3.0 - h));
+      g = 3.0 * i - (r + b);
+    } else if (2.0 / 3.0 * M_PI  < h && h <= 4.0 / 3.0 * M_PI) {
+      h -= 2.0 / 3.0 * M_PI;
+      r = i * (1.0 - s);
+      g = i * (1.0 + (s * cos(h)) / cos(M_PI / 3.0 - h));
+      b = 3.0 * i - (r + g);
+    } else if (4.0 / 3.0 * M_PI < h && h <= 2.0 * M_PI) {
+      h -= 4.0 / 3.0 * M_PI;
+      g = i * (1.0 - s);
+      b = i * (1.0 + s * cos(h) / cos(M_PI / 3.0 - h));
+      r = 3.0 * i - (g + b);
+    } else {
+      r = g = b = 1;
+      std::cout << "Error: h = " << h << std::endl;
+    }
+
+    r *= 255;
+    g *= 255;
+    b *= 255;
+
+    *(destP + 0) = std::clamp(r, 0.0, 255.0);
+    *(destP + 1) = std::clamp(g, 0.0, 255.0);
+    *(destP + 2) = std::clamp(b, 0.0, 255.0);
+  }
+
   return true;
 }
