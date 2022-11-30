@@ -2,10 +2,7 @@
 #include "MyFloatImage.h"
 #include "math.h"
 #include <iostream>
-#include <cstdint>
 #include <algorithm>
-#include <iostream>
-#include <iomanip>
 
 const double PI = 3.1415926535897932384626433832795;
 
