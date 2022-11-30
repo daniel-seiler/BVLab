@@ -1,4 +1,5 @@
 #include "MyTypeImage.h"
+#include <iostream>
 
 
 // the following declarations are necessary for linking 
