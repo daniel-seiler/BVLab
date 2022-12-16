@@ -46,12 +46,46 @@ void visualizeVec(std::vector<cv::Vec3f> *circles, cv::Mat *frame) {
     cv::imshow("Live", *frame);
 }
 
+void calcMeanCircle(std::vector<cv::Vec3f> *set, cv::Vec3f *circle) {
+    double radius, x, y = 0.0;
+    for (auto &tmpCircle: *set) {
+        x += tmpCircle[0];
+        y += tmpCircle[1];
+        radius += tmpCircle[2];
+    }
+    x /= set->size();
+    y /= set->size();
+    radius /= set->size();
+
+    circle[0] = x;
+    circle[1] = y;
+    circle[2] = radius;
+    std::cout << radius << std::endl;
+}
+
 bool compareCircles(const cv::Vec3f &a, const cv::Vec3f &b) {
     return a[2] < b[2];
 }
 
-void maxDiff(std::vector<cv::Vec3f> *circles, std::vector<cv::Vec3f> *set1, std::vector<cv::Vec3f> *set2) {
-  //TODO implement equivalent of calcThreshByOtsu to divide vector
+int maxDiff(std::vector<cv::Vec3f> *circles) {
+    int bestIndex = -1;
+    double maxDiff = 0.0;
+    for (int i = 0; i < circles->size(); i++) {
+        std::vector<cv::Vec3f> set1(circles->begin(), circles->begin() + i);
+        std::vector<cv::Vec3f> set2(circles->begin() + i, circles->end());
+        cv::Vec3f tmpC1;
+        cv::Vec3f tmpC2;
+        calcMeanCircle(&set1, &tmpC1);
+        calcMeanCircle(&set2, &tmpC2);
+        if (tmpC1[2] > 0 && tmpC1[2] < 300 && tmpC2[2] > 0 && tmpC2[2] < 300) {
+            double tmpDiff = tmpC1[2] - tmpC2[2];
+            if (tmpDiff > maxDiff) {
+                maxDiff = tmpDiff;
+                bestIndex = i;
+            }
+        }
+    }
+    return bestIndex;
 }
 
 int main(int, char**)
