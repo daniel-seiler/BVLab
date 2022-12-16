@@ -28,17 +28,20 @@ void matchCircles(std::vector<cv::Vec3f> *circles, cv::Mat *frame) {
 
 }
 
-void visualize(std::vector<cv::Vec3f> *circles, cv::Mat *frame) {
-  for (size_t i = 0; i < circles->size(); i++) {
-    cv::Vec3i c = (*circles)[i];
-    cv::Point center = cv::Point(c[0], c[1]);
+void visualize(cv::Vec3f *c, cv::Mat *frame) {
+    cv::Point center = cv::Point((*c)[0], (*c)[1]);
 
     circle(*frame, center, 1, cv::Scalar(0, 100, 100), 3, cv::LINE_AA);
 
-    int radius = c[2];
+    int radius = (*c)[2];
     circle(*frame, center, radius, cv::Scalar(255, 0, 255), 3, cv::LINE_AA);
-    //std::cout << radius << std::endl;
-  }
+}
+
+void visualizeVec(std::vector<cv::Vec3f> *circles, cv::Mat *frame) {
+    for (size_t i = 0; i < circles->size(); i++) {
+        cv::Vec3i c = (*circles)[i];
+        visualize(&(*circles)[i], frame);
+    }
 
     cv::imshow("Live", *frame);
 }
