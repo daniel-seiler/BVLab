@@ -20,9 +20,11 @@ void matchCircles(std::deque<cv::Vec3f> *circles, cv::Mat *frame) {
     //prepare frame
     cv::cvtColor(*frame, preparedFrame, 6);
     cv::medianBlur(preparedFrame, preparedFrame, 5);
-
+    cv::Mat edges;
+    Canny(preparedFrame, edges, 100, 200, 5, false);
+    cv::imshow("First", edges);
     //fit circles
-    HoughCircles(preparedFrame, tmpCircles, cv::HOUGH_GRADIENT, 1, 1, 25, 90, 40, 200);
+    HoughCircles(edges, tmpCircles, cv::HOUGH_GRADIENT, 1, 1, 25, 125, 40, 200);
 
     //add to existing circles
     circles->insert(circles->end(), tmpCircles.begin(), tmpCircles.end());
@@ -104,11 +106,18 @@ int main(int, char**)
     cv::VideoCapture cap;
     // open the default camera using default API
     // cap.open(0);
-    // OR advance usage: select any API backend
-    int deviceID = 0;             // 0 = open default camera
+    // OR advance usge: select any API backend
+
+    int deviceID = 1;             // 0 = open default camera
     int apiID = cv::CAP_ANY;      // 0 = autodetect default API
     // open selected camera using selected API
     cap.open(deviceID, apiID);
+    while(!cap.isOpened()) {
+        deviceID++;
+        cap.open(deviceID, apiID);
+        std::cout << deviceID << std::endl;
+    }
+
     // check if we succeeded
     if (!cap.isOpened()) {
         std::cerr << "ERROR! Unable to open camera\n";
@@ -121,18 +130,20 @@ int main(int, char**)
         std::deque<cv::Vec3f> circles;
         cv::Mat frame;
 
-        while(circles.size() < 5) {
+        while(circles.size() < 20) {
             captureFrame(&cap, &frame);
-            resize(frame, frame, cv::Size(), 0.15, 0.15);
+            //resize(frame, frame, cv::Size(), 0.15, 0.15);
             matchCircles(&circles, &frame);
 
             //if (cv::waitKey(5) >= 0)
             //    return 0;
             cv::waitKey(50);
+            //visualizeVec(&circles, &frame);
+            //cv::imshow("First", frame);
         }
 
         cv::Vec3f avgCircle1, avgCircle2;
-        //visualizeVec(&circles, &frame);
+        visualizeVec(&circles, &frame);
         maxDiff(&circles, &avgCircle1, &avgCircle2);
 
         visualize(&avgCircle1, &frame);
