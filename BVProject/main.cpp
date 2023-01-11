@@ -13,16 +13,18 @@ void captureFrame(cv::VideoCapture* cap, cv::Mat *frame) {
     }
 }
 
-void matchCircles(std::deque<cv::Vec3f> *circles, cv::Mat *frame) {
+void matchCircles(std::vector<cv::Vec3f> *circles, cv::Mat *frame) {
     cv::Mat preparedFrame;
     std::vector<cv::Vec3f> tmpCircles;
 
     //prepare frame
     cv::cvtColor(*frame, preparedFrame, 6);
     cv::medianBlur(preparedFrame, preparedFrame, 5);
-
+    cv::Mat edges;
+    Canny(preparedFrame, edges, 100, 200, 5, false);
+    cv::imshow("First", edges);
     //fit circles
-    HoughCircles(preparedFrame, tmpCircles, cv::HOUGH_GRADIENT, 1, 1, 25, 90, 40, 200);
+    HoughCircles(edges, tmpCircles, cv::HOUGH_GRADIENT, 1, 1, 25, 125, 40, 200);
 
     //add to existing circles
     circles->insert(circles->end(), tmpCircles.begin(), tmpCircles.end());
@@ -65,7 +67,66 @@ void calcMeanCircle(std::deque<cv::Vec3f> *set, cv::Vec3f *circle) {
     (*circle)[2] = radius;
 }
 
-int maxDiff(std::deque<cv::Vec3f> *circles, cv::Vec3f *avgCircle1, cv::Vec3f *avgCircle2) {
+void calcMeanCircle(std::deque<cv::Vec3f> *set, int indexStart, int indexEnd, cv::Vec3f *circle) {
+    double radius, x, y = 0.0;
+    for (int i = indexStart; i < indexEnd; i++) {
+        x += (*set)[i][0];
+        y += (*set)[i][1];
+        radius += (*set)[i][2];
+    }
+    x /= (indexEnd - indexStart);
+    y /= (indexEnd - indexStart);
+    radius /= (indexEnd - indexStart);
+
+    (*circle)[0] = x;
+    (*circle)[1] = y;
+    (*circle)[2] = radius;
+}
+
+int maxDiff(std::vector<cv::Vec3f> *circles, cv::Vec3f *avgCircle1, cv::Vec3f *avgCircle2) {
+    cv::Mat labels;
+    std::vector<cv::Vec3f> centers;
+    cv::kmeans(*circles, 2, labels, cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 10, 1.0), 3, cv::KMEANS_PP_CENTERS, centers);
+
+    *avgCircle1 = centers.at(0);
+    *avgCircle2 = centers.at(1);
+}
+
+//int maxDiff(std::deque<cv::Vec3f> *circles, cv::Vec3f *avgCircle1, cv::Vec3f *avgCircle2) {
+//    //sort vector by radius
+//    std::sort(circles->begin(), circles->end(), [](const cv::Vec3f &a, const cv::Vec3f &b) {
+//        return a[2] > b[2];
+//    });
+//
+//    if (circles->size() < 2) {
+//        return 0;
+//    }
+//
+//    double maxDiff = -1.0;
+//    int maxDiffIndex = -1;
+//    for (int i = 1; i < circles->size(); i++) {
+//        double avgLower, avgHigher = 0.0;
+//        for (int iLower = 0; iLower < i; iLower++) {
+//            avgLower += (*circles)[iLower][2];
+//        }
+//        avgLower /= (i);
+//        for (int iHigher = i; iHigher < circles->size(); iHigher++) {
+//            avgHigher += (*circles)[iHigher][2];
+//        }
+//        avgHigher /= (circles->size() - i);
+//
+//        if (maxDiff < avgLower - avgHigher) {
+//            maxDiff = avgLower - avgHigher;
+//            maxDiffIndex = i;
+//        }
+//    }
+//
+//    calcMeanCircle(circles, 0, maxDiffIndex, avgCircle1);
+//    calcMeanCircle(circles, maxDiffIndex, circles->size(), avgCircle2);
+//    std::cout << "AVG - maxDiff: " << maxDiff << ", maxDiffIndex: " << maxDiffIndex << std::endl;
+//}
+
+int maxDiffOld(std::deque<cv::Vec3f> *circles, cv::Vec3f *avgCircle1, cv::Vec3f *avgCircle2) {
     //sort vector
     std::sort(circles->begin(), circles->end(), [](const cv::Vec3f &a, const cv::Vec3f &b) {
         return a[2] > b[2];
@@ -104,11 +165,18 @@ int main(int, char**)
     cv::VideoCapture cap;
     // open the default camera using default API
     // cap.open(0);
-    // OR advance usage: select any API backend
-    int deviceID = 0;             // 0 = open default camera
+    // OR advance usge: select any API backend
+
+    int deviceID = 4;             // 0 = open default camera
     int apiID = cv::CAP_ANY;      // 0 = autodetect default API
     // open selected camera using selected API
     cap.open(deviceID, apiID);
+    while(!cap.isOpened()) {
+        deviceID++;
+        cap.open(deviceID, apiID);
+        std::cout << deviceID << std::endl;
+    }
+
     // check if we succeeded
     if (!cap.isOpened()) {
         std::cerr << "ERROR! Unable to open camera\n";
@@ -118,17 +186,19 @@ int main(int, char**)
     std::cout << "Start grabbing" << std::endl
               << "Press any key to terminate" << std::endl;
     while(42) {
-        std::deque<cv::Vec3f> circles;
+        std::vector<cv::Vec3f> circles;
         cv::Mat frame;
 
         while(circles.size() < 5) {
             captureFrame(&cap, &frame);
-            resize(frame, frame, cv::Size(), 0.15, 0.15);
+            //resize(frame, frame, cv::Size(), 0.15, 0.15);
             matchCircles(&circles, &frame);
 
             //if (cv::waitKey(5) >= 0)
             //    return 0;
             cv::waitKey(50);
+            //visualizeVec(&circles, &frame);
+            //cv::imshow("First", frame);
         }
 
         cv::Vec3f avgCircle1, avgCircle2;
