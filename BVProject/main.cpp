@@ -44,119 +44,20 @@ void visualize(cv::Vec3f *c, cv::Mat *frame) {
     visualize(c, frame, cv::Scalar(255, 0, 255));
 }
 
-void visualizeVec(std::deque<cv::Vec3f> *circles, cv::Mat *frame) {
+void visualize(std::deque<cv::Vec3f> *circles, cv::Mat *frame) {
     for (size_t i = 0; i < circles->size(); i++) {
         cv::Vec3i c = (*circles)[i];
         visualize(&(*circles)[i], frame, cv::Scalar(0, 100, 100));
     }
 }
 
-void calcMeanCircle(std::deque<cv::Vec3f> *set, cv::Vec3f *circle) {
-    double radius, x, y = 0.0;
-    for (auto &tmpCircle: *set) {
-        x += tmpCircle[0];
-        y += tmpCircle[1];
-        radius += tmpCircle[2];
-    }
-    x /= set->size();
-    y /= set->size();
-    radius /= set->size();
-
-    (*circle)[0] = x;
-    (*circle)[1] = y;
-    (*circle)[2] = radius;
-}
-
-void calcMeanCircle(std::deque<cv::Vec3f> *set, int indexStart, int indexEnd, cv::Vec3f *circle) {
-    double radius, x, y = 0.0;
-    for (int i = indexStart; i < indexEnd; i++) {
-        x += (*set)[i][0];
-        y += (*set)[i][1];
-        radius += (*set)[i][2];
-    }
-    x /= (indexEnd - indexStart);
-    y /= (indexEnd - indexStart);
-    radius /= (indexEnd - indexStart);
-
-    (*circle)[0] = x;
-    (*circle)[1] = y;
-    (*circle)[2] = radius;
-}
-
-int maxDiff(std::vector<cv::Vec3f> *circles, cv::Vec3f *avgCircle1, cv::Vec3f *avgCircle2) {
+int cluster(std::vector<cv::Vec3f> *circles, cv::Vec3f *avgCircle1, cv::Vec3f *avgCircle2) {
     cv::Mat labels;
     std::vector<cv::Vec3f> centers;
     cv::kmeans(*circles, 2, labels, cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 10, 1.0), 3, cv::KMEANS_PP_CENTERS, centers);
 
     *avgCircle1 = centers.at(0);
     *avgCircle2 = centers.at(1);
-}
-
-//int maxDiff(std::deque<cv::Vec3f> *circles, cv::Vec3f *avgCircle1, cv::Vec3f *avgCircle2) {
-//    //sort vector by radius
-//    std::sort(circles->begin(), circles->end(), [](const cv::Vec3f &a, const cv::Vec3f &b) {
-//        return a[2] > b[2];
-//    });
-//
-//    if (circles->size() < 2) {
-//        return 0;
-//    }
-//
-//    double maxDiff = -1.0;
-//    int maxDiffIndex = -1;
-//    for (int i = 1; i < circles->size(); i++) {
-//        double avgLower, avgHigher = 0.0;
-//        for (int iLower = 0; iLower < i; iLower++) {
-//            avgLower += (*circles)[iLower][2];
-//        }
-//        avgLower /= (i);
-//        for (int iHigher = i; iHigher < circles->size(); iHigher++) {
-//            avgHigher += (*circles)[iHigher][2];
-//        }
-//        avgHigher /= (circles->size() - i);
-//
-//        if (maxDiff < avgLower - avgHigher) {
-//            maxDiff = avgLower - avgHigher;
-//            maxDiffIndex = i;
-//        }
-//    }
-//
-//    calcMeanCircle(circles, 0, maxDiffIndex, avgCircle1);
-//    calcMeanCircle(circles, maxDiffIndex, circles->size(), avgCircle2);
-//    std::cout << "AVG - maxDiff: " << maxDiff << ", maxDiffIndex: " << maxDiffIndex << std::endl;
-//}
-
-int maxDiffOld(std::deque<cv::Vec3f> *circles, cv::Vec3f *avgCircle1, cv::Vec3f *avgCircle2) {
-    //sort vector
-    std::sort(circles->begin(), circles->end(), [](const cv::Vec3f &a, const cv::Vec3f &b) {
-        return a[2] > b[2];
-    });
-
-    std::deque<cv::Vec3f> set1, set2;
-    double sum1, sum2;
-    cv::Vec3f front = circles->front();
-    circles->pop_front();
-    set1.push_front(front);
-    sum1 = front[2];
-    cv::Vec3f back = circles->back();
-    circles->pop_back();
-    set2.push_front(front);
-    sum2 = back[2];
-
-    while (!circles->empty()) {
-        cv::Vec3f val = circles->front();
-        circles->pop_front();
-        if (abs(front[2] - val[2]) < abs(back[2] - val[2])) {
-            set1.push_front(val);
-            sum1 += val[2];
-        } else {
-            set2.push_front(val);
-            sum2 += val[2];
-        }
-    }
-
-    calcMeanCircle(&set1, avgCircle1);
-    calcMeanCircle(&set2, avgCircle2);
 }
 
 int main(int, char**)
@@ -202,8 +103,8 @@ int main(int, char**)
         }
 
         cv::Vec3f avgCircle1, avgCircle2;
-        //visualizeVec(&circles, &frame);
-        maxDiff(&circles, &avgCircle1, &avgCircle2);
+        //visualize(&circles, &frame);
+        cluster(&circles, &avgCircle1, &avgCircle2);
 
         visualize(&avgCircle1, &frame);
         visualize(&avgCircle2, &frame);
