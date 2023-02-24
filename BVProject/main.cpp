@@ -97,8 +97,7 @@ int main(int, char**)
     // open the default camera using default API
     // cap.open(0);
     // OR advance usge: select any API backend
-
-    int deviceID = 4;             // 0 = open default camera
+    int deviceID = 1;             // 0 = open default camera
     int apiID = cv::CAP_ANY;      // 0 = autodetect default API
     // open selected camera using selected API
     cap.open(deviceID, apiID);
@@ -122,15 +121,15 @@ int main(int, char**)
         std::vector<cv::Vec3f> circles;
         cv::Mat frame;
 
-        while(circles.size() < 50) {
+        while(circles.size() < 20) {
             captureFrame(&cap, &frame);
-            cv::imshow("Pure", frame);
             //resize(frame, frame, cv::Size(), 0.15, 0.15);
             matchCircles(&circles, &frame);
 
             //if (cv::waitKey(5) >= 0)
             //    return 0;
-            cv::waitKey(20);
+
+            cv::waitKey(50);
             //visualizeVec(&circles, &frame);
             //cv::imshow("First", frame);
         }
